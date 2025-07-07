@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(/api/users)
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -26,22 +26,22 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    @GetMapping(/{id})
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(User not found));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    @PutMapping(/{id})
+    @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(User not found));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         existing.setName(user.getName());
         existing.setEmail(user.getEmail());
         return userRepository.save(existing);
     }
 
-    @DeleteMapping(/{id})
+    @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
