@@ -25,12 +25,20 @@ class UserControllerTest {
     void testGetAllUsers() throws Exception {
         User user = new User();
         user.setName("Test User");
+<<<<<<< HEAD
         user.setEmail(test@example.com);
+=======
+        user.setEmail("test@example.com");
+>>>>>>> 261471a9a5bc4e061559c30fddad51893e47b4e8
         userRepository.save(user);
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
+<<<<<<< HEAD
                 .andExpect(jsonPath($[0].name).value("Test User"));
+=======
+                .andExpect(jsonPath("$[0].name").value("Test User"));
+>>>>>>> 261471a9a5bc4e061559c30fddad51893e47b4e8
     }
 }
 
