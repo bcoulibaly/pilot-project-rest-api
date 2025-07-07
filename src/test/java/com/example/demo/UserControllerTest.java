@@ -24,13 +24,13 @@ class UserControllerTest {
     @Test
     void testGetAllUsers() throws Exception {
         User user = new User();
-        user.setName(Test User);
-        user.setEmail(test@example.com);
+        user.setName("Test User");
+        user.setEmail("test@example.com");
         userRepository.save(user);
 
-        mockMvc.perform(get(/api/users))
+        mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(0.name).value(Test User));
+                .andExpect(jsonPath("$[0].name").value("Test User"));
     }
 }
 
