@@ -26,11 +26,7 @@ class UserControllerTest {
         User user = new User();
         user.setName("Test User");
         user.setEmail("test@example.com");
-        userRepCository.save(user);
+        userRepository.save(user);
 
-        mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Test User"));
-    }
+        mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$[0].name").value("Test User"));
 }
-
