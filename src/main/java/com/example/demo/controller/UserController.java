@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,24 +17,24 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<Users> getAllUsers() {
         return userRepository.findAll();
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public Users createUser(@RequestBody Users user) {
         return userRepository.save(user);
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public Users getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        User existing = userRepository.findById(id)
+    public Users updateUser(@PathVariable Long id, @RequestBody Users user) {
+        Users existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         existing.setName(user.getName());
         existing.setEmail(user.getEmail());

@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,11 @@ class UserControllerTest {
 
     @Test
     void testGetAllUsers() throws Exception {
-        User user = new User();
+        Users user = new Users();
         user.setName("Test User");
         user.setEmail("test@example.com");
         userRepository.save(user);
 
         mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$[0].name").value("Test User"));
+    }
 }
