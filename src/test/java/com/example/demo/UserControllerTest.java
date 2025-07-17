@@ -32,8 +32,9 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$["+(userRepository.count()-1)+"].name").value("Test User 2"));
     }
-    /* @BeforeEach
-    void beforeEach(){
+
+    @BeforeEach
+    void setup(){
         userRepository.deleteAll();
-    } */
+    }
 }
