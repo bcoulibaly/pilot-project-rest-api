@@ -1,18 +1,38 @@
 
+#services:
+ # postgres:
+ #   image: postgres:latest
+  #  restart: unless-stopped
+  #  environment:
+  #    POSTGRES_DB: pilotdb
+  #    POSTGRES_USER: postgres
+   #   POSTGRES_PASSWORD: admin
+  #  ports:
+   #   - 5432:5432
+  #  volumes:
+   #   - postgres_data:/var/lib/postgresql/data
+   #   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+#volumes:
+#  postgres_data: 
+
 services:
   postgres:
-    image: postgres:15
-    restart: always
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgres_test
     environment:
-      POSTGRES_DB: pilotdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
+      POSTGRES_DB: pilotdb
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+
 volumes:
-  postgres_data: 
+  pgdata:
+
 

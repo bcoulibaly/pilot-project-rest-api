@@ -2,6 +2,8 @@ package com.example.demo;
 
 import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,10 +26,14 @@ class UserControllerTest {
     @Test
     void testGetAllUsers() throws Exception {
         Users user = new Users();
-        user.setName("Test User");
-        user.setEmail("test@example.com");
+        user.setName("Test User 2");
+        user.setEmail("test2@example.com");
         userRepository.save(user);
 
-        mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$[0].name").value("Test User"));
+        mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$["+(userRepository.count()-1)+"].name").value("Test User 2"));
     }
+    /* @BeforeEach
+    void beforeEach(){
+        userRepository.deleteAll();
+    } */
 }
