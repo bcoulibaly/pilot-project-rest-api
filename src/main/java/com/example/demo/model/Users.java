@@ -1,6 +1,10 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 @Entity
 public class Users {
@@ -10,6 +14,7 @@ public class Users {
 
     private String name;
 
+    @Column(unique = true)
     private String email;
 
     public Long getId() { return id; }

@@ -2,9 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,9 +44,16 @@ public class UserController {
         return userRepository.save(existing);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userRepository.deleteById(id);
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteUserByEmail(@PathVariable String email) {
+    Optional<Users> user = userRepository.findByEmail(email);
+    if (user.isPresent()) {
+        userRepository.deleteByEmail(email);
+        return ResponseEntity.noContent().build(); // 204 no content status
+    } else {
+        return ResponseEntity.notFound().build();  // 404 not found status
     }
+}
+
 }
 

@@ -4,61 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import com.example.demo.model.Users;
-import com.example.demo.repository.UserRepository;
-
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserApiIntegrationTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest").withDatabaseName("testdb").withUsername("testuser").withPassword("testpass");
-
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @DynamicPropertySource
-    static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-    }
-
-    private String getBaseUrl() {
-        return "http://localhost:" + port + "/api/users";
-    }
-
-    @BeforeEach
-    void setup() {
-        userRepository.deleteAll();
-    }
+class UserApiIntegrationTest extends BaseConfig {
 
     @SuppressWarnings("null")
     @Test
@@ -68,10 +25,11 @@ class UserApiIntegrationTest {
         user.setName("New User");
         user.setEmail("new@example.com");
 
-        ResponseEntity<Users> response = restTemplate.postForEntity(getBaseUrl(), user, Users.class);
+        ResponseEntity<Users> response = getRestTemplate().postForEntity(getBaseUrl(), user, Users.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
+        System.out.println("Response Body User : " + response.getBody());
         assertEquals("New User", response.getBody().getName());
     }
 
@@ -82,12 +40,28 @@ class UserApiIntegrationTest {
         Users user = new Users();
         user.setName("Integration Tester");
         user.setEmail("tester@example.com");
-        userRepository.save(user);
+        getUserRepository().save(user);
 
-        ResponseEntity<Users[]> response = restTemplate.getForEntity(getBaseUrl(), Users[].class);
+        ResponseEntity<Users[]> response = getRestTemplate().getForEntity(getBaseUrl(), Users[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertTrue(response.getBody().length >= 1);
+    }
+
+    @SuppressWarnings("null")
+    @Test
+    @Order(3)
+    void testDeleteUser() {
+        Users user = new Users();
+        user.setName("User to Delete");
+        user.setEmail("delete@example.com");
+        getUserRepository().save(user);
+
+       // ResponseEntity<Void> response = etRestTemplate().exchange(getBaseUrl() + "/'" + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8) + "'", HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> response = getRestTemplate().exchange(getBaseUrl() + "/" + user.getEmail(), HttpMethod.DELETE, null, Void.class);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertTrue(getUserRepository().findByEmail(user.getEmail()).isEmpty());
     }
 }
