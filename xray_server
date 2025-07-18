@@ -1,0 +1,28 @@
+pipeline {
+    agent any // docker anbindung als agent
+
+    environment {
+        JIRA_USER     = credentials('jira-user')       // Jenkins credentials ID for username
+        JIRA_PASSWORD = credentials('jira-password')   // Jenkins credentials ID for password or token
+        XRAY_SERVER   = 'https://jira.example.com'     // your Jira/Xray base URL
+        REPORT_FILE   = 'target/surefire-reports/TEST-com.example.MyTest.xml'
+    }
+
+    stages {
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('Upload to Xray Server') {
+            steps {
+                sh """
+                    curl -u ${JIRA_USER}:${JIRA_PASSWORD} \
+                    -X POST ${XRAY_SERVER}/rest/raven/1.0/import/execution/junit \
+                    -F "file=@${REPORT_FILE}"
+                """
+            }
+        }
+    }
+}

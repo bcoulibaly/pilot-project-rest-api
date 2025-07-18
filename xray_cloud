@@ -1,0 +1,42 @@
+pipeline {
+    agent any // container anbindung
+
+    environment {
+        // Xray Cloud credentials (store them in Jenkins credentials!)
+        XRAY_CLIENT_ID     = credentials('xray-client-id')     // Jenkins ID for client_id
+        XRAY_CLIENT_SECRET = credentials('xray-client-secret') // Jenkins ID for client_secret
+        REPORT_FILE        = 'target/surefire-reports/TEST-com.example.MyTest.xml'
+    }
+
+    stages {
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('Authenticate with Xray Cloud') {
+            steps {
+                script {
+                    def response = sh(script: """
+                        curl -s -X POST https://xray.cloud.getxray.app/api/v2/authenticate \
+                        -H "Content-Type: application/json" \
+                        -d '{ "client_id": "${XRAY_CLIENT_ID}", "client_secret": "${XRAY_CLIENT_SECRET}" }'
+                    """, returnStdout: true).trim()
+
+                    env.XRAY_TOKEN = response.replaceAll('"', '')
+                }
+            }
+        }
+
+        stage('Upload Test Results to Xray') {
+            steps {
+                sh """
+                    curl -X POST https://xray.cloud.getxray.app/api/v2/import/execution/junit \
+                    -H "Authorization: Bearer ${XRAY_TOKEN}" \
+                    -F "file=@${REPORT_FILE}"
+                """
+            }
+        }
+    }
+}
